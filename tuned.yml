@@ -1,0 +1,16 @@
+---
+- name: apt ins tuned
+  hosts: server1
+  become: yes
+  
+  tasks:
+    - name: Установить пакет tuned
+      apt:
+        name: tuned
+        state: present
+        
+    - name: Запустить сервис tuned
+      service:
+        name: tuned
+        state: started
+        enabled: yes
