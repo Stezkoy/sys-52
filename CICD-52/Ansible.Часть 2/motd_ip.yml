@@ -1,0 +1,24 @@
+---
+- name: Изменить приветствие системы
+  hosts: server1
+  become: yes
+  vars:
+    custom_motd: |
+      #!/bin/sh
+      echo "=========================================="
+      echo "Добро пожаловать в систему!"
+      echo "Hostname: $(hostname)"
+      echo "IP-адрес: $(hostname -I | awk '{print $1}')"
+      echo "Желаю, чтобы кофе в кофемашине заканчивался реже, чем свободное место на диске,\nа все обновления устанавливались с первого раза, как у кота желание спать на клавиатуре!"
+      echo "=========================================="
+  tasks:
+    - name: Пакет motd
+      apt:
+        name: update-motd
+        state: present
+
+    - name: Изменить приветствие
+      copy:
+        content: "{{ custom_motd }}"
+        dest: /etc/update-motd.d/99-custom-motd
+        mode: "0755"
