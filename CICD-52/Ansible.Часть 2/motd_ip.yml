@@ -1,7 +1,7 @@
 ---
 - name: Изменить приветствие системы
   hosts: server1
-  become: yes
+  become: true
   vars:
     custom_motd: |
       #!/bin/sh
@@ -13,12 +13,12 @@
       echo "=========================================="
   tasks:
     - name: Пакет motd
-      apt:
+      ansible.builtin.apt:
         name: update-motd
         state: present
 
     - name: Изменить приветствие
-      copy:
+      ansible.builtin.copy:
         content: "{{ custom_motd }}"
         dest: /etc/update-motd.d/99-custom-motd
         mode: "0755"

@@ -1,16 +1,16 @@
 ---
-- name: apt ins tuned
+- name: Install tuned
   hosts: server1
-  become: yes
-  
+  become: true
+
   tasks:
     - name: Установить пакет tuned
-      apt:
+      ansible.builtin.apt:
         name: tuned
         state: present
-        
+
     - name: Запустить сервис tuned
-      service:
+      ansible.builtin.service:
         name: tuned
         state: started
-        enabled: yes
+        enabled: true
