@@ -1,0 +1,7 @@
+#SPDX-License-Identifier: MIT-0
+---
+# defaults file for apache
+apache:
+  package_name: apache2
+  index_file: /var/www/html/index.html
+  port: 80

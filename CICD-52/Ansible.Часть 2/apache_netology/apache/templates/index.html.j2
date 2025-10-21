@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Netology Ansible</title>
+</head>
+<body>
+    <h1>Hello World!</h1>
+    <p><strong>CPU:</strong> {{ ansible_processor_cores }} ядерный</p>
+    <p><strong>RAM:</strong> {{ (ansible_memtotal_mb) | int }} МБ</p>
+    <p><strong>HDD:</strong> {{ ansible_devices.vda.size }}</p>
+    <p><strong>IP Address:</strong> {{ ansible_default_ipv4.address }}</p>
+</body>
+</html>

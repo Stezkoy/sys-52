@@ -1,0 +1,6 @@
+---
+- name: Apache Netology role
+  hosts: server1
+  become: true
+  roles:
+    - apache

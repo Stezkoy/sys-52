@@ -1,0 +1,30 @@
+#SPDX-License-Identifier: MIT-0
+---
+# tasks file for apache
+- name: Install Apache
+  ansible.builtin.apt:
+    name: "{{ apache.package_name }}"
+    state: present
+
+- name: Start Apache
+  ansible.builtin.service:
+    name: "{{ apache.package_name }}"
+    state: started
+    enabled: true
+
+- name: Open 80 port
+  ansible.builtin.ufw:
+    rule: allow
+    port: "{{ apache.port }}"
+    direction: in
+
+- name: Index.html
+  ansible.builtin.template:
+    src: index.html.j2
+    dest: "{{ apache.index_file }}"
+  notify: Restart Apache
+
+- name: Check uri
+  ansible.builtin.uri:
+    url: http://{{ ansible_default_ipv4.address }}
+    status_code: 200
