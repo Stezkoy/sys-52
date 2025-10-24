@@ -1,0 +1,24 @@
+---
+- name: MySQL
+  hosts: all
+  become: true
+
+  tasks:
+    - name: Обновление списка пакетов
+      apt:
+        update_cache: yes
+
+    - name: Установка
+      apt:
+        name: mysql-server
+        state: present
+
+    - name: Запуск сервиса
+      service:
+        name: mysql
+        state: started
+        enabled: yes
+
+    - name: Проверить статус сервиса
+      debug:
+        var: ansible_facts.services['mysql.service']
