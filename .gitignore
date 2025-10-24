@@ -3,3 +3,4 @@
 !.terraformrc
 *.tfstate
 *.tfstate.*
+cloud-init.yml
