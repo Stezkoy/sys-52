@@ -1,6 +1,7 @@
 ---
 - name: MySQL
-  hosts: all
+  hosts: webd
+  gather_facts: false
   become: true
 
   tasks:
@@ -19,6 +20,9 @@
         state: started
         enabled: yes
 
-    - name: Проверить статус сервиса
+    - name: Собрать инфу о сервисах
+      service_facts:
+
+    - name: Проверить статус сервиса 
       debug:
         var: ansible_facts.services['mysql.service']

@@ -21,14 +21,14 @@ resource "yandex_vpc_subnet" "develop_b" {
   route_table_id = yandex_vpc_route_table.rt.id
 }
 
-/* #создаем подсеть zone D
+#создаем подсеть zone D
 resource "yandex_vpc_subnet" "develop_d" {
   name           = "develop-fops-${var.flow}-ru-central1-d"
   zone           = "ru-central1-d"
   network_id     = yandex_vpc_network.develop.id
   v4_cidr_blocks = ["10.0.3.0/24"]
   route_table_id = yandex_vpc_route_table.rt.id
-} */
+}
 
 #создаем NAT для выхода в интернет
 resource "yandex_vpc_gateway" "nat_gateway" {

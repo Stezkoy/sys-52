@@ -4,7 +4,6 @@
   hosts: webservers
   vars:
     ansible_ssh_user: stez
-    ansible_ssh_common_args: '-o StrictHostKeyChecking=no'
   become: yes
 
   pre_tasks:

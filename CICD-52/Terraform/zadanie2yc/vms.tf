@@ -109,7 +109,7 @@ resource "yandex_compute_instance" "web_b" {
   }
 }
 
-/* resource "yandex_compute_instance" "web_d" {
+resource "yandex_compute_instance" "web_d" {
   name        = "web-d" #Имя ВМ в облачной консоли
   hostname    = "web-d" #формирует FDQN имя хоста, без hostname будет сгенрировано случаное имя.
   platform_id = "standard-v3"
@@ -137,12 +137,12 @@ resource "yandex_compute_instance" "web_b" {
   scheduling_policy { preemptible = true }
 
   network_interface {
-    subnet_id          = yandex_vpc_subnet.develop_b.id
+    subnet_id          = yandex_vpc_subnet.develop_d.id
     nat                = false
     security_group_ids = [yandex_vpc_security_group.LAN.id, yandex_vpc_security_group.web_sg.id]
 
   }
-} */
+}
 
 
 resource "local_file" "inventory" {
@@ -151,14 +151,12 @@ resource "local_file" "inventory" {
   ${yandex_compute_instance.bastion.network_interface.0.nat_ip_address}
 
   [webservers]
-  ${yandex_compute_instance.web_a.network_interface.0.ip_address}
-  ${yandex_compute_instance.web_b.network_interface.0.ip_address}
-
+  weba ansible_host=${yandex_compute_instance.web_a.network_interface.0.ip_address}
+  webb ansible_host=${yandex_compute_instance.web_b.network_interface.0.ip_address}
+  webd ansible_host=${yandex_compute_instance.web_d.network_interface.0.ip_address}
 
   [webservers:vars]
   ansible_ssh_common_args='-o ProxyCommand="ssh -p 22 -W %h:%p -q stez@${yandex_compute_instance.bastion.network_interface.0.nat_ip_address}"'
   XYZ
   filename = "./hosts.ini"
 }
-
-/*   ${yandex_compute_instance.web_d.network_interface.0.ip_address} */
