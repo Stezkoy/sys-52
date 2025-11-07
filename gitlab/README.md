@@ -15,6 +15,8 @@
 
 ![runner_git](img/runner_git.png)
 
+![runner_git](img/runner_git2.png)
+
 ![runner_git](img/runner_docker.png)
 
 
@@ -33,15 +35,31 @@
  * скриншоты с успешно собранными сборками.
 
 ```
-Поле для вставки кода...
-....
-....
-....
-....
+stages:
+  - test
+  - build
+
+test:
+  stage: test
+  image: golang:1.17
+  script: 
+   - go test .
+  tags:
+   - netology
+
+build:
+  stage: build
+  image: docker:latest
+  script:
+   - docker build .
+  tags:
+   - netology
 ```
 
-`При необходимости прикрепитe сюда скриншоты
-![Название скриншота 2](ссылка на скриншот 2)`
+![gitlab_push](img/gitlab_push.png)
+
+![gitlab_runner](img/gitlab_runner.png)
+
 
 
 ---
@@ -60,3 +78,29 @@
  - тесты запускались только при изменении файлов с расширением *.go.
 
 В качестве ответа добавьте в шаблон с решением файл gitlab-ci.yml своего проекта или вставьте код в соответсвующее поле в шаблоне.
+
+```
+stages:
+  - test
+  - build
+
+test:
+  stage: test
+  image: golang:1.17
+  script:
+    - go test .
+  tags:
+    - netology
+  rules:
+    - changes:
+      - "*.go"
+
+build:
+  stage: build
+  image: docker:latest
+  script:
+    - docker build .
+  tags:
+    - netology
+  needs: []
+```
