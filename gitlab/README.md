@@ -13,8 +13,10 @@
 
 
 
-![runner_git](img/runner_git.png)`
-![runner_doker](img/runner_docker.png)`
+![runner_git](img/runner_git.png)
+
+![runner_git](img/runner_docker.png)
+
 
 ---
 
