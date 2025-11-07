@@ -104,3 +104,5 @@ build:
     - netology
   needs: []
 ```
+
+![test](img/rules.png)
