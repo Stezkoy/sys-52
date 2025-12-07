@@ -11,13 +11,13 @@
 ### Решение
 ```
 Router 1
-& enable
+$ enable
 # configure terminal
 # interface Gi0/0
 # standby 1 track Gi0/0
 
 Router 2
-& enable
+$ enable
 # configure terminal
 # interface Gi0/0
 # standby 1 track Gi0/0
