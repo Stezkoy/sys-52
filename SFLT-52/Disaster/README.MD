@@ -40,15 +40,70 @@ Router 2
 ### Решение
 
 ```
-Поле для вставки кода...
-....
-....
-....
-....
-```
+global_defs {
+    script_user keepalived_script
+    enable_script_security
+}
+vrrp_script check_web {
+    script "/etc/keepalived/scripts/check_web.sh"
+    interval 3
+    fall 2
+    rise 2
+}
 
-`При необходимости прикрепитe сюда скриншоты
-![Название скриншота 2](ссылка на скриншот 2)`
+vrrp_instance VI_1 {
+    state BACKUP
+    interface enp0s8
+    virtual_router_id 15
+    priority 200
+    advert_int 1
+    authentication {
+        auth_type PASS
+        auth_pass 1111
+    }
+    virtual_ipaddress {
+        192.168.1.171/24
+    }
+    track_script {
+        check_web
+    }
+}
+```
+```
+global_defs {
+    script_user keepalived_script
+    enable_script_security
+}
+vrrp_script check_web {
+    script "/etc/keepalived/scripts/check_web.sh"
+    interval 3
+    fall 2
+    rise 2
+}
+
+vrrp_instance VI_1 {
+    state MASTER
+    interface enp0s8
+    virtual_router_id 15
+    priority 255
+    advert_int 1
+    authentication {
+        auth_type PASS
+        auth_pass 1111
+    }
+    virtual_ipaddress {
+        192.168.1.171/24
+    }
+    track_script {
+        check_web
+    }
+}
+```
+[Bash Script](check_web.sh)
+
+
+![master](img/master.png)
+![backup](img/backup.png)
 
 
 ---
