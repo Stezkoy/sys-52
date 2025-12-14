@@ -18,7 +18,7 @@ python3 -m http.server 8002
 ```
 
 Конфиг файл:
-[haproxy.cong](zd1/haproxy.cfg)
+[haproxy.cfg](zd1/haproxy.cfg)
 
 
 ![8001](img/port8001.png)
@@ -41,7 +41,7 @@ mkdir http3 && cd http3 && echo "port 8003" > index.html
 python3 -m http.server 8003
 ```
 Конфиг файл:
-[haproxy.cong](zd2/haproxy.cfg)
+[haproxy.cfg](zd2/haproxy.cfg)
 
 ![stats2](img/stats2.png)
 ![curl](img/curl.png)
