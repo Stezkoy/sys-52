@@ -9,16 +9,15 @@
 ### Решение
 
 ```
-Поле для вставки кода...
-....
-....
-....
-....
+rsync -a --delete --exclude='/.*' --progress --checksum "$HOME/" /tmp/backup/
 ```
 
-`При необходимости прикрепитe сюда скриншоты
-![Название скриншота 1](ссылка на скриншот 1)`
+```
+--exclude='/.*' – исключает скрытые файлы и директории
+--checksum — сравнивает файлы по хэш‑суммам
+```
 
+![rsync](img/rsync1.png)
 
 
 ---
@@ -33,14 +32,23 @@
 ### Решение
 
 ```
-Поле для вставки кода...
-....
-....
-....
-....
+#!/bin/bash
+
+LOGTAG="rsync_backup"
+
+rsync -av --delete --exclude='/.*' --checksum "$HOME/" /tmp/backup/
+STATUS=$?
+
+if [ $STATUS -eq 0 ]; then
+  logger -t "$LOGTAG" "Резервное копирование успешно завершено."
+else
+  logger -t "$LOGTAG" "Резервное копирование не удалось со статусом $STATUS"
+fi
+
+exit $STATUS
 ```
 
-`При необходимости прикрепитe сюда скриншоты
-![Название скриншота 2](ссылка на скриншот 2)`
-
+![cron](img/cron1.png)
+![rsync2](img/rsync2.png)
+![journal](img/journal.png)
 ---
