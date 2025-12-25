@@ -31,13 +31,17 @@
 
 ### Решение
 
+[Полный пайплайн](yc/)
+
 ```
-Поле для вставки кода...
-....
-....
-....
-....
+terraform apply
+cd ./ansible/
+ansible-playbook -i inventory.ini setup_nginx.yml
 ```
 
-`При необходимости прикрепитe сюда скриншоты
-![Название скриншота 1](ссылка на скриншот 1)`
+
+
+
+![yc balance](img/status.png)
+![nginx](img/nginx.png)
+![status](img/balance.png)
