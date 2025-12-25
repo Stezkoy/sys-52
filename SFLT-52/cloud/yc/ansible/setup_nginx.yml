@@ -31,14 +31,14 @@
       copy:
         content: |
           <html>
-          <head><title>Hi Netology/title></head>
+          <head><title>Hi Netology</title></head>
           <body><h1>Hello from {{ inventory_hostname }}!</h1></body>
           </html>
         dest: /var/www/html/index.html
       notify: reload nginx
 
   handlers:
-    - name: Перезагрузка nginx
+    - name: reload nginx
       systemd:
         name: nginx
         state: reloaded

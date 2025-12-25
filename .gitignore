@@ -4,3 +4,4 @@
 *.tfstate
 *.tfstate.*
 cloud-init.yml
+inventory.ini

@@ -18,7 +18,7 @@ resource "yandex_compute_instance" "vm" {
   resources {
     cores  = var.vm_cores
     memory = var.vm_memory
-    core_fraction = var.vm_fraction
+    core_fraction = var.vm_core_fraction
   }
 
   boot_disk {
