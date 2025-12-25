@@ -78,3 +78,18 @@ resource "yandex_lb_network_load_balancer" "nlb" {
     }
   }
 }
+
+resource "local_file" "ansible_inventory" {
+  filename = "./ansible/inventory.ini"
+  content = <<EOT
+[web_servers]
+%{ for vm in yandex_compute_instance.vm ~}
+vm-${vm.name[-1]} ansible_host=${vm.network_interface[0].nat_ip_address} ansible_user=stez
+%{ endfor ~}
+
+[all:vars]
+ansible_ssh_private_key_file=${var.ssh_key_path}
+ansible_python_interpreter=/usr/bin/python3
+EOT
+  depends_on = [yandex_compute_instance.vm]
+}

@@ -1,0 +1,44 @@
+---
+- name: Установка Nginx
+  hosts: web_servers
+  become: yes
+  gather_facts: yes
+
+  tasks:
+    - name: Обновим кэш
+      apt:
+        update_cache: yes
+
+    - name: Установка Nginx
+      apt:
+        name: nginx
+        state: present
+
+    - name: Убедимся, что Nginx запущен и включен
+      systemd:
+        name: nginx
+        state: started
+        enabled: yes
+
+    - name: Убедимся, что Nginx доступен
+      uri:
+        url: http://localhost
+        return_content: no
+      register: nginx_check
+      ignore_errors: yes
+
+    - name: Кастомный index.html 
+      copy:
+        content: |
+          <html>
+          <head><title>Hi Netology/title></head>
+          <body><h1>Hello from {{ inventory_hostname }}!</h1></body>
+          </html>
+        dest: /var/www/html/index.html
+      notify: reload nginx
+
+  handlers:
+    - name: Перезагрузка nginx
+      systemd:
+        name: nginx
+        state: reloaded
