@@ -16,14 +16,14 @@ resource "yandex_compute_instance" "vm" {
   zone = var.zone
 
   resources {
-    cores  = 2
-    memory = 2
+    cores  = var.vm_cores
+    memory = var.vm_memory
   }
 
   boot_disk {
     initialize_params {
       image_id = var.image_id
-      size     = 10
+      size     = var.vm_disk_size
     }
   }
 
@@ -50,11 +50,11 @@ resource "yandex_lb_target_group" "tg" {
 }
 
 resource "yandex_lb_network_load_balancer" "nlb" {
-  name = "my-network-load-balancer"
+  name = "neto-balancer"
 
   listener {
-    name   = "http-listener"
-    port   = 80
+    name        = "http-listener"
+    port        = 80
     target_port = 80
 
     external_address_spec {
@@ -66,13 +66,13 @@ resource "yandex_lb_network_load_balancer" "nlb" {
     target_group_id = yandex_lb_target_group.tg.id
 
     healthcheck {
-      name = "neto-healthcheck"
+      name = "http-healthcheck"
       http_options {
         port = 80
         path = "/"
       }
-      interval = 10
-      timeout  = 5
+      interval            = 10
+      timeout             = 5
       healthy_threshold   = 2
       unhealthy_threshold = 2
     }

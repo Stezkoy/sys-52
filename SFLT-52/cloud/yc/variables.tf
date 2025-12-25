@@ -10,7 +10,7 @@ variable "image_id" {
 
 variable "ssh_key_path" {
   type        = string
-  ssh_key_path = "~/.ssh/id_ed25519.pub"
+  default = "~/.ssh/id_ed25519.pub"
 }
 
 variable "folder_id" {
@@ -31,4 +31,19 @@ variable "subnet_name" {
 variable "cidr" {
   type        = string
   default     = "10.1.0.0/24"
+}
+
+variable "vm_cores" {
+  type        = number
+  default     = 2
+}
+
+variable "vm_memory" {
+  type        = number
+  default     = 2
+}
+
+variable "vm_disk_size" {
+  type        = number
+  default     = 10
 }
