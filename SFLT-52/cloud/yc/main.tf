@@ -1,0 +1,80 @@
+resource "yandex_vpc_network" "vpc" {
+  name = var.vpc_name
+}
+
+resource "yandex_vpc_subnet" "subnet" {
+  name           = var.subnet_name
+  zone           = var.zone
+  network_id     = yandex_vpc_network.vpc.id
+  v4_cidr_blocks = [var.cidr]
+}
+
+resource "yandex_compute_instance" "vm" {
+  count = 2
+
+  name = "vm-${count.index + 1}"
+  zone = var.zone
+
+  resources {
+    cores  = 2
+    memory = 2
+  }
+
+  boot_disk {
+    initialize_params {
+      image_id = var.image_id
+      size     = 10
+    }
+  }
+
+  network_interface {
+    subnet_id = yandex_vpc_subnet.subnet.id
+    nat       = true
+  }
+
+  metadata = {
+    ssh-keys = "stez:${file(var.ssh_key_path)}"
+  }
+}
+
+resource "yandex_lb_target_group" "tg" {
+  name = "neto-target-group"
+
+  dynamic "target" {
+    for_each = yandex_compute_instance.vm
+    content {
+      subnet_id = yandex_vpc_subnet.subnet.id
+      address   = target.value.network_interface[0].ip_address
+    }
+  }
+}
+
+resource "yandex_lb_network_load_balancer" "nlb" {
+  name = "my-network-load-balancer"
+
+  listener {
+    name   = "http-listener"
+    port   = 80
+    target_port = 80
+
+    external_address_spec {
+      ip_version = "ipv4"
+    }
+  }
+
+  attached_target_group {
+    target_group_id = yandex_lb_target_group.tg.id
+
+    healthcheck {
+      name = "neto-healthcheck"
+      http_options {
+        port = 80
+        path = "/"
+      }
+      interval = 10
+      timeout  = 5
+      healthy_threshold   = 2
+      unhealthy_threshold = 2
+    }
+  }
+}
