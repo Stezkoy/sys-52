@@ -43,6 +43,11 @@ variable "vm_memory" {
   default     = 2
 }
 
+variable "vm_core_fraction" {
+  type    = number
+  default = 20
+}
+
 variable "vm_disk_size" {
   type        = number
   default     = 10

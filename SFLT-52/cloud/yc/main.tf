@@ -18,6 +18,7 @@ resource "yandex_compute_instance" "vm" {
   resources {
     cores  = var.vm_cores
     memory = var.vm_memory
+    core_fraction = var.vm_fraction
   }
 
   boot_disk {
@@ -84,11 +85,12 @@ resource "local_file" "ansible_inventory" {
   content = <<EOT
 [web_servers]
 %{ for vm in yandex_compute_instance.vm ~}
-vm-${vm.name[-1]} ansible_host=${vm.network_interface[0].nat_ip_address} ansible_user=stez
+${vm.name} ansible_host=${vm.network_interface[0].nat_ip_address} ansible_user=stez
 %{ endfor ~}
 
 [all:vars]
-ansible_ssh_private_key_file=${var.ssh_key_path}
+ansible_ssh_extra_args='-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
+ansible_ssh_private_key_file=${replace(var.ssh_key_path, ".pub", "")}
 ansible_python_interpreter=/usr/bin/python3
 EOT
   depends_on = [yandex_compute_instance.vm]

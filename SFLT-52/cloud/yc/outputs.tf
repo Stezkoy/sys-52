@@ -5,5 +5,14 @@ output "vm_ips" {
 
 output "nlb_ip" {
   description = "IP балансировщика"
-  value       = yandex_lb_network_load_balancer.nlb.listener[0].external_address_spec[0].address
+  value = one(
+    [for listener in yandex_lb_network_load_balancer.nlb.listener :
+      one(
+        [for addr in listener.external_address_spec : addr.address]
+      )
+      if listener.name == "http-listener"
+    ]
+  )
 }
+
+
