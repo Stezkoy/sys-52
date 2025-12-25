@@ -36,6 +36,10 @@ resource "yandex_compute_instance" "vm" {
   metadata = {
     ssh-keys = "stez:${file(var.ssh_key_path)}"
   }
+
+  scheduling_policy {
+    preemptible = true
+  }
 }
 
 resource "yandex_lb_target_group" "tg" {
