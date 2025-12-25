@@ -5,7 +5,7 @@ variable "zone" {
 
 variable "image_id" {
   type        = string
-  default     = "fd8ivd2v7h03r7j5345k!
+  default     = "fd883qojk2a3hruf8p7m"
 }
 
 variable "ssh_key_path" {
