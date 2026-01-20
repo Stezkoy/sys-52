@@ -31,6 +31,7 @@
 *Приведите скриншот интерфейса Kibana, на котором видны логи Nginx.*
 
 ![nginx](img/nginx.png)
+![nginx](img/nginx2.png)
 
 ---
 
