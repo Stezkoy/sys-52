@@ -1,0 +1,65 @@
+---
+- name: Скрипты producer и consumer 
+  hosts: rmq
+  become: yes
+  gather_facts: yes
+  
+  tasks:
+    - name: Установить python3-pika
+      apt:
+        name: python3-pika
+        state: present
+        update_cache: yes
+      tags: ['install']
+
+    - name: Наличие файла consumer.py
+      stat:
+        path: /home/stez/consumer.py
+      register: consumer_stat
+      tags: ['check', 'deploy', 'run']
+
+    - name: Наличие файла producer.py
+      stat:
+        path: /home/stez/producer.py
+      register: producer_stat
+      tags: ['check', 'deploy', 'run']
+
+    - name: Статус consumer.py
+      debug:
+        msg: "consumer.py: {{ 'EXISTS' if consumer_stat.stat.exists else 'MISSING' }}"
+      tags: ['check']
+
+    - name: Статус producer.py  
+      debug:
+        msg: "producer.py: {{ 'EXISTS' if producer_stat.stat.exists else 'MISSING' }}"
+      tags: ['check']
+
+    - name: Развернуть consumer.py
+      copy:
+        src: consumer.py
+        dest: /home/stez/consumer.py
+        owner: stez
+        group: stez
+        mode: '0644'
+      tags: ['deploy']
+
+    - name: Развернуть producer.py
+      copy:
+        src: producer.py
+        dest: /home/stez/producer.py
+        owner: stez
+        group: stez
+        mode: '0644'
+      tags: ['deploy']
+
+    - name: Запустить consumer.py
+      shell: python3 /home/stez/consumer.py
+      async: 10
+      poll: 0
+      tags: ['run', 'consumer']
+
+    - name: Запустить producer.py  
+      shell: python3 /home/stez/producer.py
+      async: 10
+      poll: 0
+      tags: ['run', 'producer']

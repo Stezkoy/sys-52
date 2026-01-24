@@ -1,0 +1,94 @@
+---
+- name: Complete RabbitMQ HA Cluster
+  hosts: rmq
+  become: yes
+  gather_facts: yes
+  
+  vars:
+    rabbitmq_cookie: "S3CR3T_COOKIE_123"
+    rabbitmq_admin: "admin"
+    rabbitmq_pass: "admin123"
+  
+  tasks:
+    - name: Setup /etc/hosts
+      lineinfile:
+        path: /etc/hosts
+        line: "{{ hostvars[item]['private_ip'] }} {{ item }} {{ item }}.auto.internal"
+        state: present
+      loop: "{{ groups['rmq'] }}"
+
+    - name: Set hostname
+      hostname:
+        name: "{{ inventory_hostname }}"
+
+    - name: Install RabbitMQ
+      apt:
+        update_cache: yes
+        name: rabbitmq-server
+        state: present
+
+    - name: Erlang cookie
+      copy:
+        content: "{{ rabbitmq_cookie }}"
+        dest: /var/lib/rabbitmq/.erlang.cookie
+        owner: rabbitmq
+        group: rabbitmq
+        mode: '0400'
+
+    - name: Start RabbitMQ
+      systemd:
+        name: rabbitmq-server
+        state: started
+        enabled: yes
+
+    - name: Wait AMQP 5672
+      wait_for:
+        port: 5672
+        timeout: 60
+
+    - name: Enable management plugin
+      shell: rabbitmq-plugins enable rabbitmq_management
+      ignore_errors: yes
+
+    - name: Restart после плагина
+      systemd:
+        name: rabbitmq-server
+        state: restarted
+
+    - name: Wait restart 5672
+      wait_for:
+        port: 5672
+        delay: 15
+        timeout: 60
+
+    - name: Wait UI 15672
+      wait_for:
+        port: 15672
+        delay: 10
+        timeout: 30
+
+    - name: Add admin
+      shell: rabbitmqctl add_user {{ rabbitmq_admin }} {{ rabbitmq_pass }}
+      ignore_errors: yes
+
+    - name: Admin tags
+      shell: rabbitmqctl set_user_tags {{ rabbitmq_admin }} administrator
+      ignore_errors: yes
+
+    - name: Admin permissions
+      shell: rabbitmqctl set_permissions -p / {{ rabbitmq_admin }} ".*" ".*" ".*"
+      ignore_errors: yes
+
+    - name: Cluster rmq2 only
+      block:
+        - shell: rabbitmqctl stop_app
+          ignore_errors: yes
+        - shell: rabbitmqctl reset
+          ignore_errors: yes  
+        - shell: rabbitmqctl join_cluster rabbit@rmq1
+        - shell: rabbitmqctl start_app
+      when: inventory_hostname == "rmq2"
+
+    - name: HA policy
+      shell: rabbitmqctl set_policy HA ".*" '{"ha-mode":"all"}' --apply-to queues
+      when: inventory_hostname == "rmq1"
