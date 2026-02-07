@@ -7,24 +7,18 @@
 - город нахождения магазина;
 - количество пользователей, закреплённых в этом магазине.
 
-
-1. `Заполните здесь этапы выполнения, если требуется ....`
-2. `Заполните здесь этапы выполнения, если требуется ....`
-3. `Заполните здесь этапы выполнения, если требуется ....`
-4. `Заполните здесь этапы выполнения, если требуется ....`
-5. `Заполните здесь этапы выполнения, если требуется ....`
-6. 
-
 ```
-Поле для вставки кода...
-....
-....
-....
-....
+SELECT s.first_name, s.last_name, c.city, COUNT(DISTINCT cu.customer_id) AS customer_count
+FROM store st
+JOIN staff s ON st.manager_staff_id = s.staff_id
+JOIN address a ON st.address_id = a.address_id
+JOIN city c ON a.city_id = c.city_id
+JOIN customer cu ON st.store_id = cu.store_id
+GROUP BY st.store_id, s.staff_id, c.city
+HAVING COUNT(DISTINCT cu.customer_id) > 300;
 ```
 
-`При необходимости прикрепитe сюда скриншоты
-![Название скриншота 1](ссылка на скриншот 1)`
+![task1](img/1.png)
 
 
 ---
