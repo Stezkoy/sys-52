@@ -35,12 +35,28 @@ Master-Master - оба и пишут, и копируют друг у друга
 5. `Заполните здесь этапы выполнения, если требуется ....`
 6. 
 
+master.sql
 ```
-Поле для вставки кода...
-....
-....
-....
-....
+CREATE USER 'repl'@'%' IDENTIFIED BY 'replpass';
+GRANT REPLICATION SLAVE ON *.* TO 'repl'@'%';
+FLUSH PRIVILEGES;
+```
+```
+SHOW MASTER STATUS;
+```
+slave.sql
+```
+CHANGE REPLICATION SOURCE TO
+  SOURCE_HOST='mysql_master',
+  SOURCE_USER='repl',
+  SOURCE_PASSWORD='replpass',
+  SOURCE_LOG_FILE='mysql-bin.000001',
+  SOURCE_LOG_POS=156,
+  SOURCE_SSL=1;
+START REPLICA;
+```
+```
+SHOW REPLICA STATUS\G;
 ```
 
 `При необходимости прикрепитe сюда скриншоты
@@ -62,12 +78,28 @@ Master-Master - оба и пишут, и копируют друг у друга
 5. `Заполните здесь этапы выполнения, если требуется ....`
 6. 
 
+masterone.sql
 ```
-Поле для вставки кода...
-....
-....
-....
-....
+CREATE USER 'repl_1'@'%' IDENTIFIED BY 'pass';
+GRANT REPLICATION SLAVE ON *.* TO 'repl_1'@'%';
+CHANGE REPLICATION SOURCE TO
+    SOURCE_HOST='master-2',
+    SOURCE_USER='repl_2',
+    SOURCE_PASSWORD='pass',
+    SOURCE_SSL=1;
+START REPLICA;
+
+```
+mastertwo.sql
+```
+CREATE USER 'repl_1'@'%' IDENTIFIED BY 'pass';
+GRANT REPLICATION SLAVE ON *.* TO 'repl_1'@'%';
+CHANGE REPLICATION SOURCE TO
+    SOURCE_HOST='master-2',
+    SOURCE_USER='repl_2',
+    SOURCE_PASSWORD='pass',
+    SOURCE_SSL=1;
+START REPLICA;
 ```
 
 `При необходимости прикрепитe сюда скриншоты
