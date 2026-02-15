@@ -28,15 +28,10 @@ Master-Master - оба и пишут, и копируют друг у друга
 
 *Приложите скриншоты конфигурации, выполнения работы: состояния и режимы работы серверов.*
 
-1. `Заполните здесь этапы выполнения, если требуется ....`
-2. `Заполните здесь этапы выполнения, если требуется ....`
-3. `Заполните здесь этапы выполнения, если требуется ....`
-4. `Заполните здесь этапы выполнения, если требуется ....`
-5. `Заполните здесь этапы выполнения, если требуется ....`
-6. 
-
-master.sql
+[DOCKER MASTER SLAVE](docker_mysql_master_slave/)
 ```
+###### master.sql
+
 CREATE USER 'repl'@'%' IDENTIFIED BY 'replpass';
 GRANT REPLICATION SLAVE ON *.* TO 'repl'@'%';
 FLUSH PRIVILEGES;
@@ -44,25 +39,29 @@ FLUSH PRIVILEGES;
 ```
 SHOW MASTER STATUS;
 ```
-slave.sql
 ```
+###### slave.sql
+
 CHANGE REPLICATION SOURCE TO
   SOURCE_HOST='mysql_master',
   SOURCE_USER='repl',
   SOURCE_PASSWORD='replpass',
-  SOURCE_LOG_FILE='mysql-bin.000001',
-  SOURCE_LOG_POS=156,
   SOURCE_SSL=1;
 START REPLICA;
 ```
 ```
-SHOW REPLICA STATUS\G;
+SHOW REPLICA STATUS;
+```
+```
+###### master.sql
+
+use sakila;
+CREATE TABLE test (id INT PRIMARY KEY, msg VARCHAR(20));
+INSERT INTO test VALUES (1,'Master'), (2,'Test');
 ```
 
-`При необходимости прикрепитe сюда скриншоты
-![Название скриншота 2](ссылка на скриншот 2)`
-
-
+![master_slave](img/master_slave.png)
+![docker_master_slave](img/docker_master_slave.png)
 ---
 
 ### Задание 3* 
@@ -71,37 +70,59 @@ SHOW REPLICA STATUS\G;
 
 *Приложите скриншоты конфигурации, выполнения работы: состояния и режимы работы серверов.*
 
-1. `Заполните здесь этапы выполнения, если требуется ....`
-2. `Заполните здесь этапы выполнения, если требуется ....`
-3. `Заполните здесь этапы выполнения, если требуется ....`
-4. `Заполните здесь этапы выполнения, если требуется ....`
-5. `Заполните здесь этапы выполнения, если требуется ....`
-6. 
-
-masterone.sql
+[DOCKER MASTER MASTER](docker_mysql_master_master/)
 ```
-CREATE USER 'repl_1'@'%' IDENTIFIED BY 'pass';
-GRANT REPLICATION SLAVE ON *.* TO 'repl_1'@'%';
+###### masterone.sql
+
+CREATE USER 'repl'@'%' IDENTIFIED BY 'replpass';
+GRANT REPLICATION SLAVE ON *.* TO 'repl'@'%';
+FLUSH PRIVILEGES;
+
 CHANGE REPLICATION SOURCE TO
-    SOURCE_HOST='master-2',
-    SOURCE_USER='repl_2',
-    SOURCE_PASSWORD='pass',
+    SOURCE_HOST='mysql_master_two',
+    SOURCE_USER='repl2',
+    SOURCE_PASSWORD='replpass2',
     SOURCE_SSL=1;
+
 START REPLICA;
 
 ```
-mastertwo.sql
 ```
-CREATE USER 'repl_1'@'%' IDENTIFIED BY 'pass';
-GRANT REPLICATION SLAVE ON *.* TO 'repl_1'@'%';
+SHOW REPLICA STATUS;
+```
+```
+###### mastertwo.sql
+
+CREATE USER 'repl2'@'%' IDENTIFIED BY 'replpass2';
+GRANT REPLICATION SLAVE ON *.* TO 'repl2'@'%';
+FLUSH PRIVILEGES;
+
 CHANGE REPLICATION SOURCE TO
-    SOURCE_HOST='master-2',
-    SOURCE_USER='repl_2',
-    SOURCE_PASSWORD='pass',
+    SOURCE_HOST='mysql_master_one',
+    SOURCE_USER='repl',
+    SOURCE_PASSWORD='replpass',
     SOURCE_SSL=1;
+
 START REPLICA;
 ```
+```
+SHOW REPLICA STATUS;
+```
+```
 
-`При необходимости прикрепитe сюда скриншоты
-![Название скриншота](ссылка на скриншот)`
+###### masterone.sql
+
+use MASTEEER;
+CREATE TABLE test (id INT PRIMARY KEY, msg VARCHAR(20));
+INSERT INTO test VALUES (1,'Master1'), (2,'Master1');
+```
+
+```
+###### mastertwo.sql
+
+INSERT INTO test VALUES (3,'Master2'), (4,'Master2');
+```
+![masterone](img/masterone.png)
+![mastertwo](img/mastertwo.png)
+![docker_master_master](img/docker_master_master.png)
 

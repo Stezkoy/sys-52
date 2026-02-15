@@ -1,28 +1,26 @@
 services:
-  mysql-master:
+  mysql_master_one:
+    container_name: mysql_master_one
     image: mysql:8.0
     environment:
       MYSQL_ROOT_PASSWORD: rootpass
-      MYSQL_DATABASE: sakila
+      MYSQL_DATABASE: MASTEEER
     ports:
       - "3306:3306"
     volumes:
-      - ./master/my.cnf:/etc/mysql/conf.d/my.cnf
-      - master-data:/var/lib/mysql
+      - ./masterone/my.cnf:/etc/mysql/conf.d/my.cnf
+      - ./masterone/data:/var/lib/mysql
 
-  mysql-slave:
+  mysql_master_two:
+    container_name: mysql_master_two
     image: mysql:8.0
     environment:
       MYSQL_ROOT_PASSWORD: rootpass
-      MYSQL_DATABASE: sakila
+      MYSQL_DATABASE: MASTEEER
     ports:
       - "3307:3306"
     volumes:
-      - ./slave/my.cnf:/etc/mysql/conf.d/my.cnf
-      - slave-data:/var/lib/mysql
+      - ./mastertwo/my.cnf:/etc/mysql/conf.d/my.cnf
+      - ./mastertwo/data:/var/lib/mysql
     depends_on:
-      - mysql-master
-
-volumes:
-  master-data:
-  slave-data:
+      - mysql_master_one
