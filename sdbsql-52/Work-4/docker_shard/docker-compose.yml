@@ -1,0 +1,27 @@
+services:
+  server-1:
+    image: postgres:18
+    container_name: server-1
+    environment:
+      POSTGRES_DB: sharddb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - ./data-server1:/var/lib/postgresql
+      - ./scripts/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+    ports:
+      - "5432:5432"
+
+
+  server-2:
+    image: postgres:18
+    container_name: server-2
+    environment:
+      POSTGRES_DB: sharddb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - ./data-server2:/var/lib/postgresql
+      - ./scripts/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+    ports:
+      - "5433:5432"
