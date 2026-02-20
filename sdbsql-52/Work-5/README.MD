@@ -28,8 +28,8 @@
 2.1. С помощью официальной документации приведите пример команды резервирования данных и восстановления БД (pgdump/pgrestore).
 
 ```
-pg_dump -Fc posgres > posgres.dump # Бэкапим
-pg_restore -C -d postgres posgres.dump # Востанавливаем
+pg_dump -Fc postgres > postgres.dump # Бэкапим
+pg_restore -C -d postgres postgres.dump # Востанавливаем
 ```
 2.1.* Возможно ли автоматизировать этот процесс? Если да, то как?
 
