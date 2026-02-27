@@ -21,25 +21,22 @@
   
 *Приведите ответ в свободной форме.*  
 
-1. `Заполните здесь этапы выполнения, если требуется ....`
-2. `Заполните здесь этапы выполнения, если требуется ....`
-3. `Заполните здесь этапы выполнения, если требуется ....`
-4. `Заполните здесь этапы выполнения, если требуется ....`
-5. `Заполните здесь этапы выполнения, если требуется ....`
-6. 
+### Решение 1
 
 ```
-Поле для вставки кода...
-....
-....
-....
-....
+nmap -sV 192.168.1.86
 ```
+Команда `nmap -sV 192.168.1.86` показывает, какие программы и их версии работают на компьютере, и какие порты открыты.
 
-`При необходимости прикрепитe сюда скриншоты
-![Название скриншота 1](ссылка на скриншот 1)`
+![nmap](img/nmap.png)
 
-
+Список уязвимостей:
+1. [vsftpd 2.3.4 - Backdoor Command Execution](https://www.exploit-db.com/exploits/49757)
+2. [PostgreSQL 8.2/8.3/8.4 - UDF for Command Execution](https://www.exploit-db.com/exploits/7855)
+3. [nXFree86 4.2 - 'XLOCALEDIR' Local Buffer Overflow (3)](https://www.exploit-db.com/exploits/22322)
+4. [ISC BIND (Linux/BSD) - Remote Buffer Overflow (1)](https://www.exploit-db.com/exploits/19111)
+5. [ProFTPd 1.3 - 'mod_sql' 'Username' SQL Injection](https://www.exploit-db.com/exploits/32798)
+6. ...И еще очень много...
 ---
 
 ### Задание 2
