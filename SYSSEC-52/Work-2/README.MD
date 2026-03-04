@@ -36,24 +36,25 @@
 
 *В качестве ответа пришлите снимки экрана с поэтапным выполнением задания.*
 
-1. `Заполните здесь этапы выполнения, если требуется ....`
-2. `Заполните здесь этапы выполнения, если требуется ....`
-3. `Заполните здесь этапы выполнения, если требуется ....`
-4. `Заполните здесь этапы выполнения, если требуется ....`
-5. `Заполните здесь этапы выполнения, если требуется ....`
-6. 
+1. `sudo apt update`
+2. `sudo apt install cryptsetup`
+3. `sudo fdisk /dev/sdb`
+4. `sudo cryptsetup luksFormat /dev/sdb1`
 
-```
-Поле для вставки кода...
-....
-....
-....
-....
-```
+![luks 1](img/luks1.png)
 
-`При необходимости прикрепитe сюда скриншоты
-![Название скриншота 2](ссылка на скриншот 2)`
+1. `sudo cryptsetup open /dev/sdb1 luks_netology`
+2. `sudo mkfs.ext4 /dev/mapper/luks_netology`
+3. `sudo mkdir /mnt/luks_netology`
+4. `sudo mount /dev/mapper/luks_netology /mnt/luks_netology`
+6. `touch /mnt/luks_netology/HelloNetologyLuks`
 
+![luks 2](img/luks2.png)
+
+1. `sudo umount /mnt/luks_netology`
+2. `sudo cryptsetup close luks_netology`
+
+![luks 3](img/luks3.png)
 
 ---
 
