@@ -39,6 +39,9 @@
 
 Ознакомьтесь со всеми пунктами из этой секции, не беритесь сразу выполнять задание, не дочитав до конца. Пункты взаимосвязаны и могут влиять друг на друга.
 
+![vpc](img/vpc.jpg)
+![vpc](img/cloud2.jpg)
+
 ## Структура работы
 - **VPC `neto-vpc`** (10.10.0.0/16)  
   - **Публичная подсеть `neto-public-subnet`** (10.10.1.0/24, зона `ru-central1-a`)  
@@ -74,8 +77,15 @@
 `curl -v <публичный IP балансера>:80` 
 
 #### Решение 1
+![alb](img/alb.jpg)
+![map](img/map.jpg)
+![map](img/groupalb.jpg)
+![curl](img/curla.jpg)
+![curl](img/curlb.jpg)
+![site](img/weba.jpg)
+![site](img/webb.jpg)
 
-![site](img/plug.jpg)
+http://111.88.148.170/
 
 ### Мониторинг
 Создайте ВМ, разверните на ней Zabbix. На каждую ВМ установите Zabbix Agent, настройте агенты на отправление метрик в Zabbix. 
@@ -85,6 +95,12 @@
 #### Решение 2
 
 ![site](img/plug.jpg)
+
+http://111.88.254.178/zabbix  
+(Admin/zabbix)
+
+
+`Приведите ответ в свободной форме........`
 
 ### Логи
 Cоздайте ВМ, разверните на ней Elasticsearch. Установите filebeat в ВМ к веб-серверам, настройте на отправку access.log, error.log nginx в Elasticsearch.
@@ -163,4 +179,4 @@ ansible-playbook -i inventory.ini playbooks/elasticsearch.yml
 ansible-playbook -i inventory.ini playbooks/kibana.yml  
 ansible-playbook -i inventory.ini playbooks/filebeat.yml  
 ```
-![site](img/plug.jpg)
+![terraform](img/terraform.jpg)

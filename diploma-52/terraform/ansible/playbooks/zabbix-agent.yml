@@ -1,36 +1,49 @@
 ---
-- name: Установка Zabbix агентов на веб-серверы
+- name: Установка Zabbix-агентов на все ВМ
   hosts: zabbix_agents
   become: yes
   vars:
-    zabbix_server_ip: "{{ hostvars['neto-zabbix.ru-central1.internal']['ansible_default_ipv4']['address'] | default('neto-zabbix.ru-central1.internal') }}"
+    zabbix_server_ip: "neto-zabbix.ru-central1.internal"
+
   tasks:
-    - name: Добавить GPG ключ Zabbix репозитория
-      ansible.builtin.apt_key:
-        url: https://repo.zabbix.com/zabbix-official-repo.key
+    - name: Скачать deb-пакет репозитория Zabbix 6.0
+      ansible.builtin.get_url:
+        url: "https://repo.zabbix.com/zabbix/6.0/ubuntu/pool/main/z/zabbix-release/zabbix-release_6.0-4+ubuntu22.04_all.deb"
+        dest: /tmp/zabbix-release_6.0.deb
+        mode: '0644'
+
+    - name: Установить репозиторий Zabbix
+      ansible.builtin.apt:
+        deb: /tmp/zabbix-release_6.0.deb
         state: present
 
-    - name: Добавить репозиторий Zabbix
-      ansible.builtin.apt_repository:
-        repo: "deb http://repo.zabbix.com/zabbix/6.0/ubuntu $(lsb_release -cs) main"
-        state: present
+    - name: Обновить кэш apt
+      ansible.builtin.apt:
+        update_cache: yes
 
-    - name: Установить Zabbix агент
+    - name: Установить Zabbix-агент
       ansible.builtin.apt:
         name: zabbix-agent
         state: present
-        update_cache: yes
 
-    - name: Настроить конфигурацию Zabbix агента
+    - name: Развернуть конфиг агента
       ansible.builtin.template:
         src: ../templates/zabbix_agentd.conf.j2
         dest: /etc/zabbix/zabbix_agentd.conf
         owner: root
         group: root
         mode: '0644'
+      notify: Restart zabbix-agent
 
-    - name: Перезапустить Zabbix агент
-      ansible.builtin.systemd:
+    - name: Запустить и включить zabbix-agent
+      ansible.builtin.service:
+        name: zabbix-agent
+        state: started
+        enabled: yes
+
+  handlers:
+    - name: Restart zabbix-agent
+      ansible.builtin.service:
         name: zabbix-agent
         state: restarted
         enabled: yes
