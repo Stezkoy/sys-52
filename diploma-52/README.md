@@ -23,8 +23,6 @@
 
 ---------
 
-## Структура работы
-
 ## Задача
 Ключевая задача — разработать отказоустойчивую инфраструктуру для сайта, включающую мониторинг, сбор логов и резервное копирование основных данных. Инфраструктура должна размещаться в [Yandex Cloud](https://cloud.yandex.com/) и отвечать минимальным стандартам безопасности: запрещается выкладывать токен от облака в git. Используйте [инструкцию](https://cloud.yandex.ru/docs/tutorials/infrastructure-management/terraform-quickstart#get-credentials).
 
@@ -40,6 +38,20 @@
 **Так как прерываемая ВМ проработает не больше 24ч, перед сдачей работы на проверку дипломному руководителю сделайте ваши ВМ постоянно работающими.**
 
 Ознакомьтесь со всеми пунктами из этой секции, не беритесь сразу выполнять задание, не дочитав до конца. Пункты взаимосвязаны и могут влиять друг на друга.
+
+## Структура работы
+- **VPC `neto-vpc`** (10.10.0.0/16)  
+  - **Публичная подсеть `neto-public-subnet`** (10.10.1.0/24, зона `ru-central1-a`)  
+    - Bastion-хост (`neto-bastion`) – публичный IP, единственная точка входа по SSH.  
+    - Сервер Zabbix (`neto-zabbix`) – публичный IP, веб-интерфейс :80.  
+    - Kibana (`neto-kibana`) – публичный IP, порт :5601.  
+    - Application Load Balancer (`neto-alb`) – публичный IP, слушает :80, проксирует на веб-серверы.  
+  - **Приватная подсеть `neto-private-a`** (10.10.101.0/24, зона `ru-central1-a`)  
+    - Веб-сервер 1 (`neto-web-a`).  
+    - Elasticsearch (`neto-elasticsearch`).  
+  - **Приватная подсеть `neto-private-b`** (10.10.102.0/24, зона `ru-central1-b`)  
+    - Веб-сервер 2 (`neto-web-b`).  
+
 
 ### Сайт
 Создайте две ВМ в разных зонах, установите на них сервер nginx, если его там нет. ОС и содержимое ВМ должно быть идентичным, это будут наши веб-сервера.
@@ -139,5 +151,16 @@ Cоздайте ВМ, разверните на ней Elasticsearch. Устан
 3. Ожидание моментального ответа на свой вопрос. Дипломные руководители — работающие инженеры, которые занимаются, кроме преподавания, своими проектами. Их время ограничено, поэтому постарайтесь задавать правильные вопросы, чтобы получать быстрые ответы :)
 
 ## Запуск в работу
-
+```
+terraform init  
+terraform apply  
+  
+cd ansible  
+ansible-playbook -i inventory.ini playbooks/webserver.yml  
+ansible-playbook -i inventory.ini playbooks/zabbix-server.yml  
+ansible-playbook -i inventory.ini playbooks/zabbix-agent.yml  
+ansible-playbook -i inventory.ini playbooks/elasticsearch.yml  
+ansible-playbook -i inventory.ini playbooks/kibana.yml  
+ansible-playbook -i inventory.ini playbooks/filebeat.yml  
+```
 ![site](img/plug.jpg)

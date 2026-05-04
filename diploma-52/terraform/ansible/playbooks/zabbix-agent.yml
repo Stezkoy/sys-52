@@ -1,6 +1,6 @@
 ---
 - name: Установка Zabbix агентов на веб-серверы
-  hosts: webservers
+  hosts: zabbix_agents
   become: yes
   vars:
     zabbix_server_ip: "{{ hostvars['neto-zabbix.ru-central1.internal']['ansible_default_ipv4']['address'] | default('neto-zabbix.ru-central1.internal') }}"
