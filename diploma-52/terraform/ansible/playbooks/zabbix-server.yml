@@ -1,0 +1,62 @@
+---
+- name: Установка Zabbix сервера
+  hosts: zabbix
+  become: yes
+  tasks:
+    - name: Установить пакеты для Docker
+      ansible.builtin.apt:
+        name:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - gnupg
+          - lsb-release
+        state: present
+        update_cache: yes
+
+    - name: Добавить GPG ключ Docker
+      ansible.builtin.apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+
+    - name: Добавить репозиторий Docker
+      ansible.builtin.apt_repository:
+        repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+        state: present
+
+    - name: Установить Docker
+      ansible.builtin.apt:
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+          - docker-compose-plugin
+        state: present
+        update_cache: yes
+
+    - name: Включить и запустить Docker
+      ansible.builtin.systemd:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Создать директорию для Zabbix
+      ansible.builtin.file:
+        path: /opt/zabbix
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
+
+    - name: Скопировать docker-compose.yml
+      ansible.builtin.template:
+        src: ../templates/zabbix-docker-compose.yml.j2
+        dest: /opt/zabbix/docker-compose.yml
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Запустить Zabbix через Docker Compose
+      community.docker.docker_compose:
+        project_src: /opt/zabbix
+        state: present

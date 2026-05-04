@@ -1,0 +1,42 @@
+---
+- name: Установка Filebeat
+  hosts: webservers
+  become: yes
+  vars:
+    elasticsearch_host: "neto-elasticsearch.ru-central1.internal:9200"
+  tasks:
+    - name: Добавить GPG ключ Elastic
+      ansible.builtin.apt_key:
+        url: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+        state: present
+
+    - name: Добавить репозиторий Elastic
+      ansible.builtin.apt_repository:
+        repo: "deb https://artifacts.elastic.co/packages/8.x/apt stable main"
+        state: present
+
+    - name: Установить Filebeat
+      ansible.builtin.apt:
+        name: filebeat
+        state: present
+        update_cache: yes
+
+    - name: Настроить Filebeat
+      ansible.builtin.template:
+        src: ../templates/filebeat.yml.j2
+        dest: /etc/filebeat/filebeat.yml
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Включить модуль nginx
+      ansible.builtin.command:
+        cmd: filebeat modules enable nginx
+      args:
+        creates: /etc/filebeat/modules.d/nginx.yml
+
+    - name: Перезапустить Filebeat
+      ansible.builtin.systemd:
+        name: filebeat
+        state: restarted
+        enabled: yes

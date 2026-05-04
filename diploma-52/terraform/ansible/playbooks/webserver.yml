@@ -1,0 +1,57 @@
+---
+- name: Настройка веб-серверов
+  hosts: webservers
+  become: yes
+
+  tasks:
+    - name: Установить Nginx
+      ansible.builtin.apt:
+        name: nginx
+        state: present
+        update_cache: true
+
+    - name: Запустить и включить Nginx
+      ansible.builtin.systemd:
+        name: nginx
+        state: started
+        enabled: true
+
+    - name: Создать директорию для сайта
+      ansible.builtin.file:
+        path: /var/www/site
+        state: directory
+        owner: www-data
+        group: www-data
+        mode: '0755'
+
+    - name: Развернуть index.html с именем хоста
+      ansible.builtin.template:
+        src: ../templates/index.html.j2
+        dest: /var/www/site/index.html
+        owner: www-data
+        group: www-data
+        mode: '0644'
+
+    - name: Настроить конфигурацию Nginx для статического сайта
+      ansible.builtin.template:
+        src: ../templates/nginx-site.conf.j2
+        dest: /etc/nginx/sites-available/site.conf
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Активировать конфигурацию сайта
+      ansible.builtin.file:
+        src: /etc/nginx/sites-available/site.conf
+        dest: /etc/nginx/sites-enabled/site.conf
+        state: link
+
+    - name: Удалить дефолтный конфиг, если мешает
+      ansible.builtin.file:
+        path: /etc/nginx/sites-enabled/default
+        state: absent
+
+    - name: Перезапустить Nginx
+      ansible.builtin.systemd:
+        name: nginx
+        state: restarted

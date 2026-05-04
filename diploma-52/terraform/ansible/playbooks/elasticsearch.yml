@@ -1,0 +1,64 @@
+---
+- name: Установка Elasticsearch
+  hosts: elasticsearch
+  become: yes
+  tasks:
+    - name: Установить Docker
+      ansible.builtin.apt:
+        name:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - gnupg
+          - lsb-release
+        state: present
+        update_cache: yes
+
+    - name: Добавить GPG ключ Docker
+      ansible.builtin.apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+
+    - name: Добавить репозиторий Docker
+      ansible.builtin.apt_repository:
+        repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+        state: present
+
+    - name: Установить Docker
+      ansible.builtin.apt:
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+        state: present
+        update_cache: yes
+
+    - name: Запустить Docker
+      ansible.builtin.systemd:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Создать директорию для данных Elasticsearch
+      ansible.builtin.file:
+        path: /opt/elasticsearch/data
+        state: directory
+        owner: 1000
+        group: 1000
+        mode: '0755'
+
+    - name: Запустить контейнер Elasticsearch
+      community.docker.docker_container:
+        name: elasticsearch
+        image: elasticsearch:8.11.0
+        state: started
+        restart_policy: always
+        ports:
+          - "9200:9200"
+          - "9300:9300"
+        env:
+          discovery.type: single-node
+          xpack.security.enabled: "false"
+          "ES_JAVA_OPTS": "-Xms512m -Xmx512m"
+        volumes:
+          - /opt/elasticsearch/data:/usr/share/elasticsearch/data
