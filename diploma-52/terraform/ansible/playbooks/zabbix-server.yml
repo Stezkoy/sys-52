@@ -1,5 +1,5 @@
 ---
-- name: Установка Zabbix-сервера 
+- name: Установка Zabbix-сервера
   hosts: zabbix
   become: yes
   vars:
@@ -10,15 +10,15 @@
     zabbix_server_listen_ip: "0.0.0.0"
 
   tasks:
-    - name: Скачать deb-пакет репозитория Zabbix 
+    - name: Скачать deb-пакет репозитория Zabbix
       ansible.builtin.get_url:
-        url: "https://repo.zabbix.com/zabbix/6.0/ubuntu/pool/main/z/zabbix-release/zabbix-release_6.0-4+ubuntu22.04_all.deb"
-        dest: /tmp/zabbix-release_6.0.deb
+        url: "https://repo.zabbix.com/zabbix/7.0/ubuntu/pool/main/z/zabbix-release/zabbix-release_7.0-2+ubuntu22.04_all.deb"
+        dest: /tmp/zabbix-release_7.0.deb
         mode: '0644'
 
     - name: Установить репозиторий Zabbix
       ansible.builtin.apt:
-        deb: /tmp/zabbix-release_6.0.deb
+        deb: /tmp/zabbix-release_7.0.deb
         state: present
 
     - name: Обновить кэш apt
@@ -108,6 +108,15 @@
         state: present
       notify: Restart apache2
 
+    - name: Создать конфигурацию веб-интерфейса Zabbix
+      ansible.builtin.template:
+        src: ../templates/zabbix.conf.php.j2
+        dest: /etc/zabbix/web/zabbix.conf.php
+        owner: www-data
+        group: www-data
+        mode: '0640'
+      notify: Restart apache2
+
     - name: Запустить и включить zabbix-server
       ansible.builtin.service:
         name: zabbix-server
@@ -120,20 +129,6 @@
         state: started
         enabled: yes
 
-    - name: Создать конфигурацию веб-интерфейса Zabbix
-      ansible.builtin.template:
-        src: ../templates/zabbix.conf.php.j2
-        dest: /etc/zabbix/web/zabbix.conf.php
-        owner: www-data
-        group: www-data
-        mode: '0640'
-      notify: Restart apache2
-
-    - name: Удалить файл установщика (если остался)
-      ansible.builtin.file:
-        path: /usr/share/zabbix/setup.php
-        state: absent
-        
   handlers:
     - name: Restart zabbix-server
       ansible.builtin.service:

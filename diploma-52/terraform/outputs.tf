@@ -1,5 +1,5 @@
 output "bastion_public_ip" {
-  description = "Публичный IP-адрес bastion-хоста"
+  description = "Публичный IP bastion"
   value       = yandex_compute_instance.neto_bastion.network_interface[0].nat_ip_address
 }
 

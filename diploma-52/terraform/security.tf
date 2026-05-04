@@ -1,6 +1,6 @@
 resource "yandex_vpc_security_group" "neto_web_sg" {
   name        = "neto-web-sg"
-  description = "Правила для веб-серверов: HTTP из подсетей балансировщика, SSH от bastion"
+  description = "Правила для веб-серверов: HTTP из подсетей балансировщика, SSH от bastion, Zabbix-агент"
   network_id  = yandex_vpc_network.neto_vpc.id
 
   ingress {
@@ -14,6 +14,13 @@ resource "yandex_vpc_security_group" "neto_web_sg" {
     protocol       = "TCP"
     description    = "SSH от bastion"
     port           = 22
+    v4_cidr_blocks = [var.public_subnet_cidr]
+  }
+
+  ingress {
+    protocol       = "TCP"
+    description    = "Zabbix agent от сервера Zabbix"
+    port           = 10050
     v4_cidr_blocks = [var.public_subnet_cidr]
   }
 
@@ -35,18 +42,35 @@ resource "yandex_vpc_security_group" "neto_zabbix_sg" {
     port           = 80
     v4_cidr_blocks = ["0.0.0.0/0"]
   }
+
   ingress {
     protocol       = "TCP"
     description    = "Порт Zabbix-агентов"
     port           = 10050
     v4_cidr_blocks = [var.private_a_subnet_cidr, var.private_b_subnet_cidr, var.public_subnet_cidr]
   }
+
+  ingress {
+    protocol       = "TCP"
+    description    = "Self-agent (localhost)"
+    port           = 10050
+    v4_cidr_blocks = ["127.0.0.1/32"]
+  }
+
+  ingress {
+    protocol       = "TCP"
+    description    = "Active agent registration and data"
+    port           = 10051
+    v4_cidr_blocks = [var.public_subnet_cidr, var.private_a_subnet_cidr, var.private_b_subnet_cidr]
+  }
+
   ingress {
     protocol       = "TCP"
     description    = "SSH"
     port           = 22
     v4_cidr_blocks = [var.public_subnet_cidr]
   }
+
   egress {
     protocol       = "ANY"
     description    = "Разрешить весь исходящий трафик"
@@ -56,7 +80,7 @@ resource "yandex_vpc_security_group" "neto_zabbix_sg" {
 
 resource "yandex_vpc_security_group" "neto_elasticsearch_sg" {
   name        = "neto-elasticsearch-sg"
-  description = "Правила для Elasticsearch: API порт и доступ от Kibana/Filebeat"
+  description = "Правила для Elasticsearch: API порт и доступ от Kibana/Filebeat, Zabbix-агент"
   network_id  = yandex_vpc_network.neto_vpc.id
 
   ingress {
@@ -65,12 +89,21 @@ resource "yandex_vpc_security_group" "neto_elasticsearch_sg" {
     port           = 9200
     v4_cidr_blocks = [var.public_subnet_cidr, var.private_a_subnet_cidr, var.private_b_subnet_cidr]
   }
+
+  ingress {
+    protocol       = "TCP"
+    description    = "Zabbix agent от сервера Zabbix"
+    port           = 10050
+    v4_cidr_blocks = [var.public_subnet_cidr]
+  }
+
   ingress {
     protocol       = "TCP"
     description    = "SSH"
     port           = 22
     v4_cidr_blocks = [var.public_subnet_cidr]
   }
+
   egress {
     protocol       = "ANY"
     description    = "Разрешить весь исходящий трафик"
@@ -80,7 +113,7 @@ resource "yandex_vpc_security_group" "neto_elasticsearch_sg" {
 
 resource "yandex_vpc_security_group" "neto_kibana_sg" {
   name        = "neto-kibana-sg"
-  description = "Правила для Kibana: веб-интерфейс"
+  description = "Правила для Kibana: веб-интерфейс, Zabbix-агент"
   network_id  = yandex_vpc_network.neto_vpc.id
 
   ingress {
@@ -89,12 +122,21 @@ resource "yandex_vpc_security_group" "neto_kibana_sg" {
     port           = 5601
     v4_cidr_blocks = ["0.0.0.0/0"]
   }
+
+  ingress {
+    protocol       = "TCP"
+    description    = "Zabbix agent от сервера Zabbix"
+    port           = 10050
+    v4_cidr_blocks = [var.public_subnet_cidr]
+  }
+
   ingress {
     protocol       = "TCP"
     description    = "SSH"
     port           = 22
     v4_cidr_blocks = [var.public_subnet_cidr]
   }
+
   egress {
     protocol       = "ANY"
     description    = "Разрешить весь исходящий трафик"

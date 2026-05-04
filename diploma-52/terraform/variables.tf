@@ -61,5 +61,5 @@ variable "private_b_subnet_cidr" {
 variable "preemptible" {
   description = "Использовать прерываемые ВМ (true — да, false — на постоянку)"
   type        = bool
-  default     = true
+  default     = false
 }

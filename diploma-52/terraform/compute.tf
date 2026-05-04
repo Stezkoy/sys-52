@@ -1,6 +1,3 @@
-#  ВЕБ-СЕРВЕРЫ
-
-# Веб-сервер в зоне А
 resource "yandex_compute_instance" "neto_web_a" {
   name        = "neto-web-a"
   hostname    = "neto-web-a"
@@ -43,7 +40,6 @@ resource "yandex_compute_instance" "neto_web_a" {
   }
 }
 
-# Веб-сервер в зоне B
 resource "yandex_compute_instance" "neto_web_b" {
   name        = "neto-web-b"
   hostname    = "neto-web-b"
@@ -77,8 +73,6 @@ resource "yandex_compute_instance" "neto_web_b" {
     preemptible = var.preemptible
   }
 }
-
-#  ZABBIX
 
 resource "yandex_compute_instance" "neto_zabbix" {
   name        = "neto-zabbix"
@@ -115,8 +109,6 @@ resource "yandex_compute_instance" "neto_zabbix" {
   }
 }
 
-#  ELASTICSEARCH
-
 resource "yandex_compute_instance" "neto_elasticsearch" {
   name        = "neto-elasticsearch"
   hostname    = "neto-elasticsearch"
@@ -150,8 +142,6 @@ resource "yandex_compute_instance" "neto_elasticsearch" {
     preemptible = var.preemptible
   }
 }
-
-#  KIBANA
 
 resource "yandex_compute_instance" "neto_kibana" {
   name        = "neto-kibana"

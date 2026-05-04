@@ -5,7 +5,6 @@ filebeat.inputs:
       - /var/log/nginx/access.log
     fields:
       log_type: nginx_access
-
   - type: log
     enabled: true
     paths:
@@ -14,8 +13,7 @@ filebeat.inputs:
       log_type: nginx_error
 
 output.elasticsearch:
-  hosts: ["{{ elasticsearch_host }}"]
-  index: "filebeat-%{[agent.version]}-%{+yyyy.MM.dd}"
+  hosts: ["http://neto-elasticsearch.ru-central1.internal:9200"]
 
 setup.kibana:
-  host: "neto-kibana.ru-central1.internal:5601"
+  host: "http://neto-kibana.ru-central1.internal:5601"
