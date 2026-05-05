@@ -1,0 +1,99 @@
+---
+- name: Настройка автореги
+  hosts: zabbix
+  gather_facts: no
+  tasks:
+    - name: Получить токен аутентификации
+      ansible.builtin.uri:
+        url: "http://localhost/zabbix/api_jsonrpc.php"
+        method: POST
+        body_format: json
+        body:
+          jsonrpc: "2.0"
+          method: "user.login"
+          params:
+            username: "Admin"
+            password: "zabbix"
+          id: 1
+      register: login_result
+
+    - name: Сохранить токен
+      set_fact:
+        zabbix_auth: "{{ login_result.json.result }}"
+
+    - name: Получить ID группы "Linux servers"
+      ansible.builtin.uri:
+        url: "http://localhost/zabbix/api_jsonrpc.php"
+        method: POST
+        body_format: json
+        body:
+          jsonrpc: "2.0"
+          method: "hostgroup.get"
+          params:
+            filter:
+              name: "Linux servers"
+          auth: "{{ zabbix_auth }}"
+          id: 2
+      register: group_result
+
+    - name: Получить ID шаблона "Linux by Zabbix agent"
+      ansible.builtin.uri:
+        url: "http://localhost/zabbix/api_jsonrpc.php"
+        method: POST
+        body_format: json
+        body:
+          jsonrpc: "2.0"
+          method: "template.get"
+          params:
+            filter:
+              host: "Linux by Zabbix agent"
+          auth: "{{ zabbix_auth }}"
+          id: 3
+      register: template_result
+
+    - name: Установить числовые идентификаторы
+      set_fact:
+        groupid: "{{ group_result.json.result[0].groupid | int }}"
+        templateid: "{{ template_result.json.result[0].templateid | int }}"
+
+    - name: Создать действие автореги
+      ansible.builtin.uri:
+        url: "http://localhost/zabbix/api_jsonrpc.php"
+        method: POST
+        body_format: json
+        body:
+          jsonrpc: "2.0"
+          method: "action.create"
+          params:
+            name: "Auto registration Linux servers"
+            eventsource: 2
+            status: 0
+            filter:
+              evaltype: 1
+              conditions: []
+            operations:
+              - operationtype: 4 
+                opgroup:
+                  - groupid: "{{ groupid }}"
+              - operationtype: 6
+                optemplate:
+                  - templateid: "{{ templateid }}"
+          auth: "{{ zabbix_auth }}"
+          id: 4
+      register: action_create
+
+    - name: Вывести результат
+      ansible.builtin.debug:
+        var: action_create.json
+
+    - name: Выход из API
+      ansible.builtin.uri:
+        url: "http://localhost/zabbix/api_jsonrpc.php"
+        method: POST
+        body_format: json
+        body:
+          jsonrpc: "2.0"
+          method: "user.logout"
+          params: []
+          auth: "{{ zabbix_auth }}"
+          id: 5

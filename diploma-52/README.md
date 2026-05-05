@@ -173,7 +173,8 @@ terraform apply
   
 cd ansible  
 ansible-playbook -i inventory.ini playbooks/webserver.yml  
-ansible-playbook -i inventory.ini playbooks/zabbix-server.yml  
+ansible-playbook -i inventory.ini playbooks/zabbix-server.yml
+ansible-playbook -i inventory.ini playbooks/zabbix-autoreg.yml   
 ansible-playbook -i inventory.ini playbooks/zabbix-agent.yml  
 ansible-playbook -i inventory.ini playbooks/elasticsearch.yml  
 ansible-playbook -i inventory.ini playbooks/kibana.yml  

@@ -1,5 +1,5 @@
 ---
-- name: Установка Zabbix-сервера
+- name: Установка Zabbix
   hosts: zabbix
   become: yes
   vars:
@@ -10,13 +10,13 @@
     zabbix_server_listen_ip: "0.0.0.0"
 
   tasks:
-    - name: Скачать deb-пакет репозитория Zabbix
+    - name: Скачать пакет репозитория
       ansible.builtin.get_url:
         url: "https://repo.zabbix.com/zabbix/7.0/ubuntu/pool/main/z/zabbix-release/zabbix-release_7.0-2+ubuntu22.04_all.deb"
         dest: /tmp/zabbix-release_7.0.deb
         mode: '0644'
 
-    - name: Установить репозиторий Zabbix
+    - name: Установить репозиторий
       ansible.builtin.apt:
         deb: /tmp/zabbix-release_7.0.deb
         state: present
@@ -25,7 +25,7 @@
       ansible.builtin.apt:
         update_cache: yes
 
-    - name: Установить Zabbix-сервер, фронтенд и SQL-скрипты
+    - name: Установить Zabbix
       ansible.builtin.apt:
         name:
           - zabbix-server-pgsql
@@ -40,8 +40,7 @@
         state: present
 
     - name: Включить PHP-модули pgsql
-      ansible.builtin.command:
-        cmd: phpenmod pgsql pdo_pgsql
+      ansible.builtin.shell: phpenmod pgsql pdo_pgsql
       notify: Restart apache2
 
     - name: Установить PostgreSQL
@@ -71,7 +70,7 @@
         zcat /usr/share/zabbix-sql-scripts/postgresql/server.sql.gz | sudo -u postgres psql -d {{ zabbix_db_name }}
       when: not zabbix_schema_flag.stat.exists
 
-    - name: Создать файл-флаг после импорта схемы
+    - name: Создать файл-флаг
       ansible.builtin.file:
         path: /var/lib/postgresql/.zabbix_schema_loaded
         state: touch
@@ -91,7 +90,7 @@
       args:
         executable: /bin/bash
 
-    - name: Развернуть конфиг zabbix_server.conf
+    - name: Развернуть конфиг
       ansible.builtin.template:
         src: ../templates/zabbix_server.conf.j2
         dest: /etc/zabbix/zabbix_server.conf
@@ -100,7 +99,31 @@
         mode: '0644'
       notify: Restart zabbix-server
 
-    - name: Настроить временную зону PHP в apache.conf
+    - name: Установить PHP-FPM
+      ansible.builtin.apt:
+        name: php-fpm
+        state: present
+
+    - name: Определить версию PHP
+      ansible.builtin.shell: php -r "echo PHP_MAJOR_VERSION.'.'.PHP_MINOR_VERSION;"
+      register: php_version
+      changed_when: false
+
+    - name: Запустить PHP-FPM
+      ansible.builtin.systemd:
+        name: "php{{ php_version.stdout }}-fpm"
+        state: started
+        enabled: yes
+
+    - name: Сокет в конфигурации Zabbix
+      ansible.builtin.replace:
+        path: /etc/apache2/conf-enabled/zabbix.conf
+        regexp: 'unix:/var/run/php/zabbix\.sock'
+        replace: 'unix:/run/php/php{{ php_version.stdout }}-fpm.sock'
+      notify: Restart apache2
+    # --------------------------------------
+
+    - name: Настроить временную зону PHP
       ansible.builtin.lineinfile:
         path: /etc/zabbix/apache.conf
         regexp: '^\s*php_value\s+date.timezone'
@@ -108,7 +131,7 @@
         state: present
       notify: Restart apache2
 
-    - name: Создать конфигурацию веб-интерфейса Zabbix
+    - name: Создать конфигурацию интерфейса Zabbix
       ansible.builtin.template:
         src: ../templates/zabbix.conf.php.j2
         dest: /etc/zabbix/web/zabbix.conf.php
@@ -116,6 +139,11 @@
         group: www-data
         mode: '0640'
       notify: Restart apache2
+
+    - name: Включить модули
+      ansible.builtin.shell: a2enmod proxy proxy_fcgi
+      notify: Restart apache2
+    # -------------------------------------------------------
 
     - name: Запустить и включить zabbix-server
       ansible.builtin.service:
