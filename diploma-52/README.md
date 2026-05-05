@@ -80,12 +80,14 @@
 ![alb](img/alb.jpg)
 ![map](img/map.jpg)
 ![map](img/groupalb.jpg)
-![curl](img/curla.jpg)
-![curl](img/curlb.jpg)
+
 ![site](img/weba.jpg)
 ![site](img/webb.jpg)
 
-http://111.88.148.170/
+![curl](img/curla.jpg)
+![curl](img/curlb.jpg)
+
+http://111.88.148.108
 
 ### Мониторинг
 Создайте ВМ, разверните на ней Zabbix. На каждую ВМ установите Zabbix Agent, настройте агенты на отправление метрик в Zabbix. 
@@ -94,13 +96,11 @@ http://111.88.148.170/
 
 #### Решение 2
 
-![site](img/plug.jpg)
+![zabbix](img/zabbix.jpg)
+![Host](img/zab_hosts.jpg)
 
-http://111.88.254.178/zabbix  
-(Admin/zabbix)
-
-
-`Приведите ответ в свободной форме........`
+http://111.88.253.47/zabbix
+`Admin/zabbix`
 
 ### Логи
 Cоздайте ВМ, разверните на ней Elasticsearch. Установите filebeat в ВМ к веб-серверам, настройте на отправку access.log, error.log nginx в Elasticsearch.
@@ -109,8 +109,9 @@ Cоздайте ВМ, разверните на ней Elasticsearch. Устан
 
 #### Решение 3
 
-![site](img/plug.jpg)
+![kibana](img/kibana.jpg)
 
+http://111.88.241.41:5601
 ### Сеть
 Разверните один VPC. Сервера web, Elasticsearch поместите в приватные подсети. Сервера Zabbix, Kibana, application load balancer определите в публичную подсеть.
 
@@ -123,13 +124,17 @@ Cоздайте ВМ, разверните на ней Elasticsearch. Устан
 #### Решение 4
 
 ![map](img/map2.jpg)
+![secgroups](img/secgroups.jpg)
+![ip](img/ip.jpg)
+
 
 ### Резервное копирование
 Создайте snapshot дисков всех ВМ. Ограничьте время жизни snaphot в неделю. Сами snaphot настройте на ежедневное копирование.
 
 #### Решение 5
 
-![site](img/plug.jpg)
+![snapshots_daily.jpg](img/snapshots_daily.jpg)
+![snapshots_init.jpg](img/snapshots_init.jpg)
 
 ### Дополнительно
 Не входит в минимальные требования. 
