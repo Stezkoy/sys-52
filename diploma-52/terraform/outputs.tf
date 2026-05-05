@@ -17,8 +17,3 @@ output "kibana_public_ip" {
   description = "Публичный IP Kibana"
   value       = yandex_compute_instance.neto_kibana.network_interface[0].nat_ip_address
 }
-
-output "elasticsearch_private_ip" {
-  description = "Приватный IP Elasticsearch"
-  value       = yandex_compute_instance.neto_elasticsearch.network_interface[0].ip_address
-}
